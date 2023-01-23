@@ -5,6 +5,7 @@ import { IoArrowBack } from 'react-icons/io5'
 import { MoviesApi } from '../api';
 import { MovieFull, MovieTrailerResponse } from '../interfaces/index';
 import { MovieContext } from '../context/MovieContext';
+import { BounceLoader } from 'react-spinners';
 
 export const MovieDetail = () => {
 
@@ -12,6 +13,7 @@ export const MovieDetail = () => {
   const { state } = useLocation();
   const { state: { currentMovieListPath } } = useContext(MovieContext)
 
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [movieDetail, setMovieDetail] = useState<MovieFull>({} as MovieFull);
   const [genres, setGenres] = useState<string[]>([]);
   const [trailerKey, setTrailerKey] = useState("");
@@ -22,25 +24,32 @@ export const MovieDetail = () => {
   useEffect(() => {
 
     const fetchData = async () => {
-
+      setIsLoading(true);
       const { data } = await MoviesApi.get<MovieFull>(`/${params.id}`);
       const { data: trailerData } = await MoviesApi.get<MovieTrailerResponse>(`/${params.id}/videos`)
 
       setMovieDetail(data);
-      setTrailerKey(trailerData.results[0].key);
+      setTrailerKey(trailerData.results[0]?.key || "");
 
       const genresArray: string[] = [];
 
       data.genres.forEach(e => {
         genresArray.push(e.name)
       });
-
       setGenres(genresArray);
+      setIsLoading(false);
     }
 
     fetchData()
   }, [params.id])
 
+  if(isLoading){
+    return (
+      <div className='h-full flex-1 flex items-center justify-center'>
+        <BounceLoader color='#fff' />
+      </div>
+    )
+  }
 
   return (
     <div className='p-8 w-full md:w-5/6 overflow-auto'>
@@ -71,14 +80,14 @@ export const MovieDetail = () => {
             <span className='text-xl font-bold'>Overview</span>
             <p className='relative z-20 text-gray-400'>{movieDetail.overview}</p>
           </div>
-          <div>
+          <div className='flex flex-col items-center'>
             {
               trailerKey?.length > 1
               && (
               <>
-                <div className='mb-2'><span className='text-xl font-bold'>Trailer</span></div>
+                <div className='mb-2 w-full'><span className='text-xl font-bold'>Trailer</span></div>
                 <iframe
-                  className='w-full h-[315]'
+                  className='w-full md:w-[90%] lg:w-[80%] xl:w-[60%] h-[315]'
                   // width="560"
                   height="315"
                   src={`https://www.youtube-nocookie.com/embed/${trailerKey}`}

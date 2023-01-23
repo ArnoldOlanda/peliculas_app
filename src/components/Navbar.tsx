@@ -52,7 +52,7 @@ export const Navbar = ({collapsed,setCollapsed}:Props) => {
 
   return (
     <div className='w-full h-16 bg-red-500 flex'>
-      <div className='hidden w-0 md:w-2/6 md:flex bg-red-600 h-full flex-wrap place-content-center'>
+      <div className='hidden w-0 sm:w-2/6 lg:w-1/6 md:flex bg-red-600 h-full flex-wrap place-content-center'>
         <Link to="/">Peliculas App</Link>
       </div>
       <div className="w-full md:w-5/6 h-full flex items-center p-0 md:p-4 relative">
